@@ -1,0 +1,31 @@
+name: Prettier Code Quality
+
+on:
+  push:
+    branches:
+      - master # Or your default branch name
+  pull_request:
+    branches:
+      - master # Or your default branch name
+
+jobs:
+  prettier-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # Ensures the action has access to all commits for accurate diffing/committing
+        fetch-depth: 0 
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20 # Use a recommended Node.js version
+
+    - name: Install dependencies
+      run: npm ci # Use npm ci to ensure clean installation in CI
+
+    - name: Run Prettier check
+      run: npm run prettier-check
