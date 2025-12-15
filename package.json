@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "node index.js"
+    "server": "node index.js",
+    "prettify": "prettier --write .",
+    "prettier-check": "prettier --check ."
   },
   "author": "",
   "license": "ISC",
@@ -23,5 +25,8 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "ruru": "^2.0.0-rc.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4"
   }
 }

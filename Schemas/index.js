@@ -10,18 +10,18 @@ const {
 } = graphql;
 
 // Import data models for products and orders.
-const  {Product}  = require("../models/products");
-const  {Order} = require("../models/orders");
-const  {User} = require("../models/users");
+const { Product } = require("../models/products");
+const { Order } = require("../models/orders");
+const { User } = require("../models/users");
 
 const ProductType = require("./TypeDefs/ProductType");
 const UserType = require("./TypeDefs/UserType");
 const OrderType = require("./TypeDefs/OrderType");
 
-const dotenv = require('dotenv');
-dotenv.config('.env')
+const dotenv = require("dotenv");
+dotenv.config(".env");
 
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 // Define the RootQuery, which is the entry point for querying data.
 const RootQuery = new GraphQLObjectType({
@@ -63,17 +63,17 @@ const RootQuery = new GraphQLObjectType({
     getUser: {
       type: UserType,
       args: {
-        username: {type: GraphQLString}
+        username: { type: GraphQLString },
       },
       async resolve(parent, args) {
-        const user = await User.findOne({username: args.username});
-        return user
-      }
+        const user = await User.findOne({ username: args.username });
+        return user;
+      },
     },
     getAllUsers: {
-       type: new GraphQLList(UserType),
-       args: { id: { type: GraphQLString } },
-        async resolve(parent, args, req) {
+      type: new GraphQLList(UserType),
+      args: { id: { type: GraphQLString } },
+      async resolve(parent, args, req) {
         const userList = await User.find({ id: args.id });
         return userList;
       },
@@ -99,9 +99,7 @@ const Mutation = new GraphQLObjectType({
         title: { type: GraphQLString },
       },
       async resolve(parent, args, req) {
-        console.log("resolve called " + JSON.stringify
-          (args)
-        )
+        console.log("resolve called " + JSON.stringify(args));
         const newProduct = new Product({
           title: args.title,
           brand: args.brand,
@@ -117,13 +115,11 @@ const Mutation = new GraphQLObjectType({
 
         await newProduct.save();
 
-        return newProduct;;
+        return newProduct;
       },
       async reject(error) {
-                console.log("reject called " + JSON.stringify
-          (error)
-        )
-      }
+        console.log("reject called " + JSON.stringify(error));
+      },
     },
     updateProduct: {
       type: ProductType,
@@ -179,20 +175,20 @@ const Mutation = new GraphQLObjectType({
         isAdmin: { type: graphql.GraphQLBoolean },
       },
       async resolve(parent, args, req) {
-        console.log("Register resolve called " + JSON.stringify(args))
+        console.log("Register resolve called " + JSON.stringify(args));
         const newUser = new User({
           username: args.username,
           email: args.email,
           password: args.password,
-          isAdmin: args.isAdmin
+          isAdmin: args.isAdmin,
         });
         try {
-          await newUser.save()
-          return 'Registration successful';
-        } catch(error) {
-          throw new Error('Registration failed');
+          await newUser.save();
+          return "Registration successful";
+        } catch (error) {
+          throw new Error("Registration failed");
         }
-      }
+      },
     },
     login: {
       type: GraphQLString,
@@ -201,21 +197,31 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
       },
       resolve: async (parent, args) => {
+        console.log(`****Login API called*****`);
         const user = await User.findOne({ username: args.username });
-        if (!user) throw new Error('User not found');
-        if (user.password !== args.password) throw new Error('Incorrect password');
+        if (!user) {
+          console.log(`user not found ${args.username} ${args.password}`);
+          throw new Error("User not found");
+        }
+        if (user.password !== args.password) {
+          console.log(`Incorrect pass`);
+          throw new Error("Incorrect password");
+        }
         const payload = { sub: user.id };
-        const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign(payload, process.env.SECRET_KEY, {
+          expiresIn: "1d",
+        });
         return token;
       },
       reject: async (error) => {
-        console.log(`Login error ${JSON.stringify(error)}`)
-      }
-    }
-}});
+        console.log(`Login error ${JSON.stringify(error)}`);
+      },
+    },
+  },
+});
 
 // Export a GraphQLSchema that includes the RootQuery.
 module.exports = new GraphQLSchema({
   query: RootQuery,
-  mutation: Mutation
+  mutation: Mutation,
 });
