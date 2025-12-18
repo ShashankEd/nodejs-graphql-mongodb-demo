@@ -2,3 +2,5 @@ node_modules/
 .env
 *.log
 .github/
+README.Docker.md
+README.md
